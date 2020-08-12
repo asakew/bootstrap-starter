@@ -3,6 +3,4 @@
 
 Bootstrapni boshlovchilar uchun kichik fayllar namuna...
 
-Repo Demo: https://asakew.github.io/bootstrap-starter/cover.html
-
 Office site: https://https://v5.getbootstrap.com/
