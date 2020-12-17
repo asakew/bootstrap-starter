@@ -1,12 +1,13 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.0.0-alpha1): alert.js
+ * Bootstrap (v5.0.0-beta1): alert.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import {
   getjQuery,
+  onDOMContentLoaded,
   TRANSITION_END,
   emulateTransitionEnd,
   getElementFromSelector,
@@ -14,6 +15,7 @@ import {
 } from './util/index'
 import Data from './dom/data'
 import EventHandler from './dom/event-handler'
+import BaseComponent from './base-component'
 
 /**
  * ------------------------------------------------------------------------
@@ -22,12 +24,11 @@ import EventHandler from './dom/event-handler'
  */
 
 const NAME = 'alert'
-const VERSION = '5.0.0-alpha1'
 const DATA_KEY = 'bs.alert'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const SELECTOR_DISMISS = '[data-dismiss="alert"]'
+const SELECTOR_DISMISS = '[data-bs-dismiss="alert"]'
 
 const EVENT_CLOSE = `close${EVENT_KEY}`
 const EVENT_CLOSED = `closed${EVENT_KEY}`
@@ -43,29 +44,17 @@ const CLASSNAME_SHOW = 'show'
  * ------------------------------------------------------------------------
  */
 
-class Alert {
-  constructor(element) {
-    this._element = element
-
-    if (this._element) {
-      Data.setData(element, DATA_KEY, this)
-    }
-  }
-
+class Alert extends BaseComponent {
   // Getters
 
-  static get VERSION() {
-    return VERSION
+  static get DATA_KEY() {
+    return DATA_KEY
   }
 
   // Public
 
   close(element) {
-    let rootElement = this._element
-    if (element) {
-      rootElement = this._getRootElement(element)
-    }
-
+    const rootElement = element ? this._getRootElement(element) : this._element
     const customEvent = this._triggerCloseEvent(rootElement)
 
     if (customEvent === null || customEvent.defaultPrevented) {
@@ -73,11 +62,6 @@ class Alert {
     }
 
     this._removeElement(rootElement)
-  }
-
-  dispose() {
-    Data.removeData(this._element, DATA_KEY)
-    this._element = null
   }
 
   // Private
@@ -100,8 +84,7 @@ class Alert {
 
     const transitionDuration = getTransitionDurationFromElement(element)
 
-    EventHandler
-      .one(element, TRANSITION_END, () => this._destroyElement(element))
+    EventHandler.one(element, TRANSITION_END, () => this._destroyElement(element))
     emulateTransitionEnd(element, transitionDuration)
   }
 
@@ -138,10 +121,6 @@ class Alert {
       alertInstance.close(this)
     }
   }
-
-  static getInstance(element) {
-    return Data.getData(element, DATA_KEY)
-  }
 }
 
 /**
@@ -149,27 +128,27 @@ class Alert {
  * Data Api implementation
  * ------------------------------------------------------------------------
  */
-EventHandler
-  .on(document, EVENT_CLICK_DATA_API, SELECTOR_DISMISS, Alert.handleDismiss(new Alert()))
-
-const $ = getjQuery()
+EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DISMISS, Alert.handleDismiss(new Alert()))
 
 /**
  * ------------------------------------------------------------------------
  * jQuery
  * ------------------------------------------------------------------------
- * add .alert to jQuery only if jQuery is present
+ * add .Alert to jQuery only if jQuery is present
  */
 
-/* istanbul ignore if */
-if ($) {
-  const JQUERY_NO_CONFLICT = $.fn[NAME]
-  $.fn[NAME] = Alert.jQueryInterface
-  $.fn[NAME].Constructor = Alert
-  $.fn[NAME].noConflict = () => {
-    $.fn[NAME] = JQUERY_NO_CONFLICT
-    return Alert.jQueryInterface
+onDOMContentLoaded(() => {
+  const $ = getjQuery()
+  /* istanbul ignore if */
+  if ($) {
+    const JQUERY_NO_CONFLICT = $.fn[NAME]
+    $.fn[NAME] = Alert.jQueryInterface
+    $.fn[NAME].Constructor = Alert
+    $.fn[NAME].noConflict = () => {
+      $.fn[NAME] = JQUERY_NO_CONFLICT
+      return Alert.jQueryInterface
+    }
   }
-}
+})
 
 export default Alert
